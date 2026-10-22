@@ -5,14 +5,15 @@
 
 import {useQuery, useQueryClient, useMutation} from '@tanstack/react-query'
 import { carrosService } from '@/api/carros.service'
+import { Carro} from '@/types/carro'
 
 //definir una constante key que servira como identificador unico
 //para las querys relacionadas con carros
-const KEY = ['carros']
+export const KEY = ['carros']
 
 export function useCarros(){
     return useQuery({
-        queryKey: ['carros'],
+        queryKey: KEY,
         queryFn: ()=>{
             console.log("GET ejecutado con tanStack")
             return carrosService.getAll()
@@ -23,13 +24,11 @@ export function useCarros(){
     })
 }
 
-//Hook personalizado useAgregar carro que encapsula la logica de agregar un carro nuevo
-//Usa useMutation con mutationFn que llama a carrosServvice.add()
-//onSuccess: invalida la query 'carros' para refrescar la lista automaticamente
+//hook para agregar recibe el carro sin id , onSucces valida la query carros para refrescar la lista automaticamnete 
 export function useAgregarCarro(){
     const qc = useQueryClient()
     return useMutation({
-        mutationFn: (marca:string) => carrosService.add(marca),
+        mutationFn: (carro: Omit<Carro, 'id'>) => carrosService.add(carro),
         onSuccess: () => qc.invalidateQueries({queryKey: KEY})
     })
 }
